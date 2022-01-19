@@ -1,0 +1,26 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <Version>1.0.0</Version>
+    <LangVersion>latest</LangVersion>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <TargetsForTfmSpecificBuildOutput>$(TargetsForTfmSpecificBuildOutput);IncludeProjectReferences</TargetsForTfmSpecificBuildOutput>
+    <Authors>Aren Chen</Authors>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageProjectUrl>https://github.com/arenchen/Netcorext.Algorithms.Snowflake</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/arenchen/Netcorext.Algorithms.Snowflake.git</RepositoryUrl>
+    <Description>Snowflake ID for C#, support JavaScript MAX_SAFE_INTEGER</Description>
+  </PropertyGroup>
+
+  <Target Name="IncludeProjectReferences" DependsOnTargets="ResolveReferences">
+    <ItemGroup>
+      <IncludeBuildOutput/>
+      <BuildOutputInPackage Include="@(ReferenceCopyLocalPaths-&gt;WithMetadataValue('ReferenceSourceTarget', 'ProjectReference'))"/>
+    </ItemGroup>
+  </Target>
+
+</Project>

@@ -2,7 +2,7 @@ name: Build and Deploy to Nuget
 
 on:
   push:
-    branches: [ main ]
+    branches: [ main, dev ]
 
 env:
   NUGET_API_URL: https://api.nuget.org/v3/index.json
@@ -11,7 +11,9 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
       - name: Setup .NET
         uses: actions/setup-dotnet@v1
         with:
@@ -21,7 +23,16 @@ jobs:
       - name: Build
         run: dotnet build --no-restore
       - name: Pack
-        run: dotnet pack --no-dependencies -c Release
+        run: |
+          BRANCH="${GITHUB_REF##*/}"
+          COMMIT_SHORT_SHA=`git rev-parse --short ${GITHUB_SHA}`
+          COMMIT_COUNT=`git rev-list --count HEAD`
+          COMMIT_TIME=`git show -s --format=%ct HEAD`
+          if [ "$BRANCH" = "main" ]; then
+            dotnet pack --no-dependencies -c Release
+          else
+            dotnet pack --no-dependencies -c Debug --version-suffix ${BRANCH}.${COMMIT_TIME}+${COMMIT_SHORT_SHA}
+          fi
       - name: Find Package
         run: |
           mkdir -p ./packages
@@ -43,4 +54,4 @@ jobs:
         with:
           dotnet-version: 6.0.x
       - name: Push packages
-        run: find ** -type f -iname '*.nupkg' -exec dotnet nuget push -s ${{ env.NUGET_API_URL }} -k ${{ secrets.NUGET_API_KEY }} --skip-duplicate {} \;
+        run: find ** -type f -regex '.*\.s?nupkg' -exec dotnet nuget push -s ${{ env.NUGET_API_URL }} -k ${{ secrets.NUGET_API_KEY }} --skip-duplicate {} \;

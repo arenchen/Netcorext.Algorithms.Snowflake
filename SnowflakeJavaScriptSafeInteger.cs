@@ -63,7 +63,7 @@ public class SnowflakeJavaScriptSafeInteger : ISnowflake
 
         while (timestamp <= lastTimestamp)
         {
-            var diffTimestamp = DEFAULT_OVERTIME - (lastTimestamp - timestamp);
+            var diffTimestamp = _overtime - (lastTimestamp - timestamp);
 
             if (diffTimestamp > 0) _overShift -= diffTimestamp;
 
@@ -86,7 +86,7 @@ public class SnowflakeJavaScriptSafeInteger : ISnowflake
             {
                 _sequence = (_sequence + 1) & MAX_SEQUENCE;
 
-                if (_sequence == 0) timestamp = _overShift < DEFAULT_OVERTIME ? GetTimestampShift(1) : GetNextTimestamp(_lastTimestamp);
+                if (_sequence == 0) timestamp = _overShift < _overtime ? GetTimestampShift(1) : GetNextTimestamp(_lastTimestamp);
             }
 
             _lastTimestamp = timestamp;
